@@ -1,54 +1,23 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <style type="text/css">
-      html { height: 100% }
-      body { height: 100%; margin: 0; padding: 0 }
-      #map_canvas { height: 100% }
-    </style>
-    <script type="text/javascript"
-      src="http://maps.googleapis.com/maps/api/js?key=AIzaSyDrQoxb5Z33_2lB6_4WkKUHlMFKAVwf_bw&sensor=true">
-    </script>
-    <script type="text/javascript">
-      var map;
-      function initialize() {
-        var mapOptions = {
-          center: new google.maps.LatLng(58, 16),
-          zoom: 7,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
-        };
-        map = new google.maps.Map(document.getElementById("map_canvas"),
-            mapOptions);
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <title>Simple markers</title>
+    <style>
+      html, body, #map-canvas {
+        height: 100%;
+        margin: 0;
+        padding: 0;
       }
-    </script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>    
+
+    </style>
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
+	<script type="text/javascript" src="script.js"></script>
+	<script type="text/javascript" src="parse.js"></script>
+
   </head>
-  <body onload="initialize()">
-    <div id="map_canvas" style="width:100%; height:100%"></div>
-    <script type="text/javascript">
-	
-	var text = '{ "employees" : [' +
-'{ "firstName":"John" , "lastName":"Doe" },' +
-'{ "firstName":"Anna" , "lastName":"Smith" },' +
-'{ "firstName":"Peter" , "lastName":"Jones" } ]}';
-	
-	var data = JSON.parse(text);
-	
-      $(document).ready(function() {
-       
-          $.each(data, function(key, data) {
-			console.log(data);
-            var latLng = new google.maps.LatLng(data.lat, data.lng); 
-            // Creating a marker and putting it on the map
-            var marker = new google.maps.Marker({
-                position: latLng,
-                title: data.title
-            });
-            marker.setMap(map);
-          });
-        
-      });
-    </script>
+  <body>
+    <div id="map-canvas"></div>
   </body>
 </html>
