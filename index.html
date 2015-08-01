@@ -58,6 +58,7 @@
     Parse.initialize("A7dtPerGYVDKNAlMGXeeAI5tTpzYFO1C7Px70C3y", "4CpvhH1bT0eM4OkhDaBa2iJ2K6Yq1KPf2e0srPZQ");
 	var User = Parse.Object.extend("UserClassWithLanguage");
 	var currentLanguage = "none";
+	var markers = [];
 	
 	function start() {
 		var name = document.getElementById("name").value;
@@ -175,16 +176,24 @@ function codeAddress(address) {
             map: map,
             position: results[0].geometry.location
         });
+		markers.push(marker);
       } else {
         console.log("Geocode was not successful for the following reason: " + status);
       }
     });
   }
+  
+function removeMarkers() {
+	for (var i = 0; i < markers.length; i++) {
+		markers[i].setMap(null);
+	}
+}
     
 function zoomChange() {
 	var zoomLevel = map.getZoom();
 	console.log(zoomLevel);
 	
+	removeMarkers();
 	
 	if (zoomLevel < 5) {
 		addAllCountries();
