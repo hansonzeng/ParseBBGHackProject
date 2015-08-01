@@ -11,61 +11,223 @@
   <link rel="stylesheet" href="css/titlestyles.css">
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+  
+  
+  <style>
+      #map-canvas {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+    </style>
+
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
 </head>
 
 
-<body><section>
+<body>
+<div id="form">
+<section>
   <ul class="input-list style-1 clearfix">
       <input type="text" id="name" placeholder="Jacqui Alain" style="width: 800px;     
       position:absolute;
-      bottom: 70%;
-      right: 15%;">
+      bottom: 74%;
+      right: 10%;">
     <br><br>
       <input type="text" id="country" placeholder="France" class="focus" style="width: 800px;     
       position:absolute;
-      bottom: 61%;
-      right: 15%;">
+      bottom: 65%;
+      right: 10%;">
     <br><br>
       <input type="text" id="city" placeholder="Paris" class="focus" style="width: 800px;     
       position:absolute;
-      bottom: 52%;
-      right: 15%;">
+      bottom: 56%;
+      right: 10%;">
     <br><br>
 
       <input type="text" id="place" placeholder="Notre Dame Cathedral" class="focus" style="width: 800px;     
       position:absolute;
-      bottom: 42%;
-      right: 15%;">
+      bottom: 47%;
+      right: 10%;">
     <br><br>
 
       <input type="text" id="language" placeholder="French" class="focus"
       style="width: 800px;     
       position:absolute;
-      bottom: 32%;
-      right: 15%;">
+      bottom: 37%;
+      right: 10%;">
 
   </ul>
 </section>
 	<div id="sign-up">
-<a href="#" class="myButton" onclick="start()">submit</a>
+		<input type="button" id="correctButton" class="myButton" onclick="start()" value="submit"/>
+	</div>
 </div>
+
+<div id="map-canvas" style="width:100%; height:100%; margin: auto; display: none">
+	
+</div>
+</body>
 
  <script type="text/javascript">
     Parse.initialize("A7dtPerGYVDKNAlMGXeeAI5tTpzYFO1C7Px70C3y", "4CpvhH1bT0eM4OkhDaBa2iJ2K6Yq1KPf2e0srPZQ");
-
-//	insertUser("George", "France", "Paris", "Eiffel Tower");
 	
-//	printAllUsers();
-	
-//	console.log(getAllCities());
+	var User = Parse.Object.extend("FinalUserClassWithLanguage");
+	var currentLanguage = "none";
+	var markers = [];
 	
 	function start() {
+		document.getElementById("form").style.display = "none";
+		document.getElementsByTagName("body")[0].style.backgroundImage = "none";
+		
+		document.getElementById("map-canvas").style.display = "block";
+	
+		var name = document.getElementById("name").value;
+		var country = document.getElementById("country").value;
+		var city = document.getElementById("city").value;
+		var place = document.getElementById("place").value;
+		var language = document.getElementById("language").value;
+		
+		insertUser(name, country, city, place, language);
+		
+		initialize();
+		
+		addAllCountries();
+	}
+	
+	
+	function printAllUsers() {
+		var queryObject = new Parse.Query(User);
+		queryObject.find({
+			success: function (results) {
+				for (var i = 0; i < results.length; i++) {
+					console.log(results[i].attributes.country);
+				}
+			},
+			error: function (error) {
+				alert("Error: " + error.code + " " + error.message);
+			}
+		});
+	}
+	
+	function insertUser(_name, _country, _city, _place, _language) {
+		var user = new User();
+		user.save({name: _name, country: _country, city: _city, place: _place, language: _language}, {
+			success: function(object) {
+				console.log("Saved!");
+			},
+			error: function(model, error) {
+				console.log("Error!" + error + " Model: " + model);
+			}
+		});
+		currentLanguage = _language;
+	}
+	
+	function addAllCities() {
+		var queryObject = new Parse.Query(User);
+		queryObject.find({
+			success: function (results) {
+				for (var i = 0; i < results.length; i++) {
+					if (results[i].attributes.language == currentLanguage) {
+						codeAddress(results[i].attributes.country + " " + results[i].attributes.city);
+					}
+				}
+			},
+			error: function (error) {
+				alert("Error: " + error.code + " " + error.message);
+			}
+		});
+	}
+	
+	function addAllPlaces() {
+		var queryObject = new Parse.Query(User);
+		queryObject.find({
+			success: function (results) {
+				for (var i = 0; i < results.length; i++) {
+					if (results[i].attributes.language == currentLanguage) {
+						codeAddress(results[i].attributes.country + " " + results[i].attributes.place);
+					}
+				}
+			},
+			error: function (error) {
+				alert("Error: " + error.code + " " + error.message);
+			}
+		});
+	}
+	
+	function addAllCountries() {
+		var queryObject = new Parse.Query(User);
+		queryObject.find({
+			success: function (results) {
+				for (var i = 0; i < results.length; i++) {
+					if (results[i].attributes.language == currentLanguage) {
+						codeAddress(results[i].attributes.country);
+					}
+				}
+			},
+			error: function (error) {
+				alert("Error: " + error.code + " " + error.message);
+			}
+		});
+	}
+	
+	
+	
+	var map;
 
-	//	setTimeout('', 2000);
-		window.location.replace("title.html");
+	function initialize() {
+		var myLatlng = new google.maps.LatLng(48.2723333,12.3363066);
+		
+		var mapOptions = {
+			zoom: 4,
+			center: myLatlng
+		}
+		map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+		
+		google.maps.event.addListener(map, 'zoom_changed', zoomChange);
+	}
+
+	var geocoder = new google.maps.Geocoder();
+
+	function codeAddress(address) {
+		geocoder.geocode( { 'address': address}, function(results, status) {
+		  if (status == google.maps.GeocoderStatus.OK) {
+		  //  map.setCenter(results[0].geometry.location);
+			var marker = new google.maps.Marker({
+				map: map,
+				position: results[0].geometry.location
+			});
+			markers.push(marker);
+		  } else {
+			console.log("Geocode was not successful for the following reason: " + status);
+		  }
+		});
+	  }
+	  
+	function removeMarkers() {
+		for (var i = 0; i < markers.length; i++) {
+			markers[i].setMap(null);
+		}
+	}
+		
+	function zoomChange() {
+		var zoomLevel = map.getZoom();
+		console.log(zoomLevel);
+		
+		removeMarkers();
+		
+		if (zoomLevel < 5) {
+			addAllCountries();
+		} else {
+			if (zoomLevel <= 12) {
+				addAllCities();
+			} else {
+				addAllPlaces();
+			}
+		}
 	}
 	
   </script>
-</body>
 
 </html>
