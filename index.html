@@ -1,9 +1,11 @@
 <!doctype html>
-<head>
-  <meta charset="utf-8">
 
-  <title>My Parse App</title>
-  <meta name="description" content="My Parse App">
+<head>
+
+  <meta charset="utf-8">
+  <header></header>
+  <title>Homesick</title>
+  <meta name="description" content="Homesick">
   <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/styles.css">
@@ -11,32 +13,14 @@
   <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
 </head>
 
-<body>
 
-	<div id="contact-form">
-    <h1>HomeSick</h1>
-    <h2>Fill out our form</h2>
-    
-    <form method="post" action="other.php">
-        <label for="name">Name: <span class="required">*</span></label>
-        <input type="text" id="name" name="name" value="" placeholder="John Doe" required="required" autofocus="autofocus" />
-         
-        <label for="country">Country: <span class="required">*</span></label>
-        <input type="text" id="country" name="country" value="" placeholder="France" required="required" autofocus="autofocus" />
-         
-        <label for="city">City: </label>
-        <input type="text" id="city" name="city" value="" placeholder="Paris" required="required" autofocus="autofocus" />
-        
-		<label for="place">Place: </label>
-        <input type="text" id="place" name="place" value="" placeholder="Notre Dame Cathedral" required="required" autofocus="autofocus" />
-        		
-        <input type="button" value="HomeSick!" id="submit-button" onclick="start()"/>
-    </form>
+<body>
+	<div id="sign-up">
+<a href="#" class="myButton">sign up</a>
 </div>
 
  <script type="text/javascript">
     Parse.initialize("A7dtPerGYVDKNAlMGXeeAI5tTpzYFO1C7Px70C3y", "4CpvhH1bT0eM4OkhDaBa2iJ2K6Yq1KPf2e0srPZQ");
-	var User = Parse.Object.extend("UserClass");
 
 //	insertUser("George", "France", "Paris", "Eiffel Tower");
 	
@@ -45,95 +29,10 @@
 //	console.log(getAllCities());
 	
 	function start() {
-		var name = document.getElementById("name").value;
-		var country = document.getElementById("country").value;
-		var city = document.getElementById("city").value;
-		var place = document.getElementById("place").value;
-		
-		console.log(name + " " + country + " " + city + " " + place);
-		
-		insertUser(name, country, city, place);
-	
+
 	//	setTimeout('', 2000);
-		window.location.replace("maps.html");
+		window.location.replace("title.html");
 	}
-	
-	function printAllUsers() {
-		var queryObject = new Parse.Query(User);
-		queryObject.find({
-			success: function (results) {
-				for (var i = 0; i < results.length; i++) {
-					console.log(results[i].attributes.country);
-				}
-			},
-			error: function (error) {
-				alert("Error: " + error.code + " " + error.message);
-			}
-		});
-	}
-	
-	function insertUser(_name, _country, _city, _place) {
-		var user = new User();
-		user.save({name: _name, country: _country, city: _city, place: _place}, {
-			success: function(object) {
-				console.log("Saved!");
-			},
-			error: function(model, error) {
-				console.log("Error!" + error + " Model: " + model);
-			}
-		});
-	}
-	
-	function getAllCities() {
-		var cities = [];
-		var queryObject = new Parse.Query(User);
-		queryObject.find({
-			success: function (results) {
-				for (var i = 0; i < results.length; i++) {
-					if (results[i].attributes.city != "undefined") {
-						cities.push(results[i].attributes.city);
-					}
-				}
-			},
-			error: function (error) {
-				alert("Error: " + error.code + " " + error.message);
-			}
-		});
-		return cities;
-	}
-	
-	function getAllPlaces() {
-		var places = [];
-		var queryObject = new Parse.Query(User);
-		queryObject.find({
-			success: function (results) {
-				for (var i = 0; i < results.length; i++) {
-					places.push(results[i].attributes.place);
-				}
-			},
-			error: function (error) {
-				alert("Error: " + error.code + " " + error.message);
-			}
-		});
-		return places;
-	}
-	
-	function getAllCountries() {
-		var countries = [];
-		var queryObject = new Parse.Query(User);
-		queryObject.find({
-			success: function (results) {
-				for (var i = 0; i < results.length; i++) {
-					countries.push(results[i].attributes.country);
-				}
-			},
-			error: function (error) {
-				alert("Error: " + error.code + " " + error.message);
-			}
-		});
-		return countries;
-	}
-	
 	
   </script>
 </body>
