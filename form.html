@@ -1,0 +1,71 @@
+<!doctype html>
+
+<head>
+
+  <meta charset="utf-8">
+  <header></header>
+  <title>Homesick</title>
+  <meta name="description" content="Homesick">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/titlestyles.css">
+  <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+</head>
+
+
+<body><section>
+  <ul class="input-list style-1 clearfix">
+      <input type="text" id="name" placeholder="Jacqui Alain" style="width: 800px;     
+      position:absolute;
+      bottom: 70%;
+      right: 15%;">
+    <br><br>
+      <input type="text" id="country" placeholder="France" class="focus" style="width: 800px;     
+      position:absolute;
+      bottom: 61%;
+      right: 15%;">
+    <br><br>
+      <input type="text" id="city" placeholder="Paris" class="focus" style="width: 800px;     
+      position:absolute;
+      bottom: 52%;
+      right: 15%;">
+    <br><br>
+
+      <input type="text" id="place" placeholder="Notre Dame Cathedral" class="focus" style="width: 800px;     
+      position:absolute;
+      bottom: 42%;
+      right: 15%;">
+    <br><br>
+
+      <input type="text" id="language" placeholder="French" class="focus"
+      style="width: 800px;     
+      position:absolute;
+      bottom: 32%;
+      right: 15%;">
+
+  </ul>
+</section>
+	<div id="sign-up">
+<a href="#" class="myButton" onclick="start()">submit</a>
+</div>
+
+ <script type="text/javascript">
+    Parse.initialize("A7dtPerGYVDKNAlMGXeeAI5tTpzYFO1C7Px70C3y", "4CpvhH1bT0eM4OkhDaBa2iJ2K6Yq1KPf2e0srPZQ");
+
+//	insertUser("George", "France", "Paris", "Eiffel Tower");
+	
+//	printAllUsers();
+	
+//	console.log(getAllCities());
+	
+	function start() {
+
+	//	setTimeout('', 2000);
+		window.location.replace("title.html");
+	}
+	
+  </script>
+</body>
+
+</html>
