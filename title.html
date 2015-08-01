@@ -1,21 +1,31 @@
 <!doctype html>
-
 <head>
-
   <meta charset="utf-8">
-  <header></header>
+  
+  <style>
+      #map-canvas {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+
+    </style>
+
   <title>My Parse App</title>
   <meta name="description" content="My Parse App">
   <meta name="viewport" content="width=device-width">
   <link rel="stylesheet" href="css/reset.css">
   <link rel="stylesheet" href="css/styles.css">
+  <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script type="text/javascript" src="http://www.parsecdn.com/js/parse-1.5.0.min.js"></script>
+  
 </head>
 
-
 <body>
+
 	<div id="contact-form">
+    <h1>HomeSick</h1>
     <h2>Fill out our form</h2>
     
     <form method="post" action="other.php">
@@ -30,34 +40,40 @@
         
 		<label for="place">Place: </label>
         <input type="text" id="place" name="place" value="" placeholder="Notre Dame Cathedral" required="required" autofocus="autofocus" />
+		
+		<label for="language">Your language: </label>
+        <input type="text" id="language" name="language" value="" placeholder="French" required="required" autofocus="autofocus" />
         		
         <input type="button" value="HomeSick!" id="submit-button" onclick="start()"/>
+		
     </form>
+	<br><br>
+	<div id="map-canvas" style="width:900px; height:500px; margin: auto">
+	
+	</div>
 </div>
 
  <script type="text/javascript">
+ 
     Parse.initialize("A7dtPerGYVDKNAlMGXeeAI5tTpzYFO1C7Px70C3y", "4CpvhH1bT0eM4OkhDaBa2iJ2K6Yq1KPf2e0srPZQ");
-	var User = Parse.Object.extend("UserClass");
-
-//	insertUser("George", "France", "Paris", "Eiffel Tower");
-	
-//	printAllUsers();
-	
-//	console.log(getAllCities());
+	var User = Parse.Object.extend("UserClassWithLanguage");
+	var currentLanguage = "none";
+	var markers = [];
 	
 	function start() {
 		var name = document.getElementById("name").value;
 		var country = document.getElementById("country").value;
 		var city = document.getElementById("city").value;
 		var place = document.getElementById("place").value;
+		var language = document.getElementById("language").value;
 		
-		console.log(name + " " + country + " " + city + " " + place);
+		insertUser(name, country, city, place, language);
 		
-		insertUser(name, country, city, place);
-	
-	//	setTimeout('', 2000);
-		window.location.replace("maps.html");
+		initialize();
+		
+		addAllCountries();
 	}
+	
 	
 	function printAllUsers() {
 		var queryObject = new Parse.Query(User);
@@ -73,9 +89,9 @@
 		});
 	}
 	
-	function insertUser(_name, _country, _city, _place) {
+	function insertUser(_name, _country, _city, _place, _language) {
 		var user = new User();
-		user.save({name: _name, country: _country, city: _city, place: _place}, {
+		user.save({name: _name, country: _country, city: _city, place: _place, language: _language}, {
 			success: function(object) {
 				console.log("Saved!");
 			},
@@ -83,16 +99,16 @@
 				console.log("Error!" + error + " Model: " + model);
 			}
 		});
+		currentLanguage = _language;
 	}
 	
-	function getAllCities() {
-		var cities = [];
+	function addAllCities() {
 		var queryObject = new Parse.Query(User);
 		queryObject.find({
 			success: function (results) {
 				for (var i = 0; i < results.length; i++) {
-					if (results[i].attributes.city != "undefined") {
-						cities.push(results[i].attributes.city);
+					if (results[i].attributes.language == currentLanguage) {
+						codeAddress(results[i].attributes.country + " " + results[i].attributes.city);
 					}
 				}
 			},
@@ -100,41 +116,96 @@
 				alert("Error: " + error.code + " " + error.message);
 			}
 		});
-		return cities;
 	}
 	
-	function getAllPlaces() {
-		var places = [];
+	function addAllPlaces() {
 		var queryObject = new Parse.Query(User);
 		queryObject.find({
 			success: function (results) {
 				for (var i = 0; i < results.length; i++) {
-					places.push(results[i].attributes.place);
+					if (results[i].attributes.language == currentLanguage) {
+						codeAddress(results[i].attributes.country + " " + results[i].attributes.place);
+					}
 				}
 			},
 			error: function (error) {
 				alert("Error: " + error.code + " " + error.message);
 			}
 		});
-		return places;
 	}
 	
-	function getAllCountries() {
-		var countries = [];
+	function addAllCountries() {
 		var queryObject = new Parse.Query(User);
 		queryObject.find({
 			success: function (results) {
 				for (var i = 0; i < results.length; i++) {
-					countries.push(results[i].attributes.country);
+					if (results[i].attributes.language == currentLanguage) {
+						codeAddress(results[i].attributes.country);
+					}
 				}
 			},
 			error: function (error) {
 				alert("Error: " + error.code + " " + error.message);
 			}
 		});
-		return countries;
 	}
 	
+	
+	
+	var map;
+
+function initialize() {
+	var myLatlng = new google.maps.LatLng(48.2723333,12.3363066);
+	
+	var mapOptions = {
+		zoom: 4,
+		center: myLatlng
+	}
+	map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+	
+	google.maps.event.addListener(map, 'zoom_changed', zoomChange);
+}
+
+var geocoder = new google.maps.Geocoder();
+
+function codeAddress(address) {
+    geocoder.geocode( { 'address': address}, function(results, status) {
+      if (status == google.maps.GeocoderStatus.OK) {
+      //  map.setCenter(results[0].geometry.location);
+        var marker = new google.maps.Marker({
+            map: map,
+            position: results[0].geometry.location
+        });
+		markers.push(marker);
+      } else {
+        console.log("Geocode was not successful for the following reason: " + status);
+      }
+    });
+  }
+  
+function removeMarkers() {
+	for (var i = 0; i < markers.length; i++) {
+		markers[i].setMap(null);
+	}
+}
+    
+function zoomChange() {
+	var zoomLevel = map.getZoom();
+	console.log(zoomLevel);
+	
+	removeMarkers();
+	
+	if (zoomLevel < 5) {
+		addAllCountries();
+	} else {
+		if (zoomLevel <= 12) {
+			addAllCities();
+		} else {
+			addAllPlaces();
+		}
+	}
+}
+
 	
   </script>
 </body>
